@@ -13,7 +13,6 @@ let
 
           - **License**: ${pkg.meta.license.shortName or "Unknown"}
           - **Homepage**: [${pkg.meta.homepage or "N/A"}](${pkg.meta.homepage or "#"})
-          - **Maintainers**: ${toString (builtins.map (m: m.name) (pkg.meta.maintainers or []))}
         '' else ""
       ) packages);
 

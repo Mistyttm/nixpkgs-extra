@@ -10,5 +10,4 @@ VRChat Package Manager CLI
 
 - **License**: unfree
 - **Homepage**: [https://vcc.docs.vrchat.com/vpm/cli](https://vcc.docs.vrchat.com/vpm/cli)
-- **Maintainers**: Emmey Rose
 
