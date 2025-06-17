@@ -72,11 +72,3 @@ nix shell github:Mistyttm/nixpkgs-extra#vpm
 ```
 
 This command will start a shell with the `vpm` package available, allowing you to use it immediately.
-
-## Packages
-
-- `vpm`: The VRChat Package Manager, a package manager for VRChat worlds and avatars.
-
-## Modules
-
-COMING SOON

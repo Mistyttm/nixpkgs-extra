@@ -23,8 +23,14 @@
         let
           myOverlay = self.overlays.default;
           myPackages = myOverlay pkgs pkgs;
+          docsGenerator = pkgs.callPackage ./docs/generate.nix {};
         in
-        myPackages;
+        myPackages // {
+          # Add documentation generator
+          generate-docs = docsGenerator {
+            packages = myPackages;
+          };
+        };
 
       # Export NixOS modules
       nixosModules = import ./modules;

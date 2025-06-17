@@ -1,51 +1,44 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs, lib ? pkgs.lib }:
 
 let
-  inherit (pkgs) lib;
-  nixpkgsExtraFlake = builtins.getFlake (toString ./..);
-  system = "x86_64-linux";
+  # Instead of getting packages from the flake directly, pass them as an argument
+  generateDocs = { packages ? {} }:
+    let
+      # Generate package documentation
+      packagesDoc = lib.concatStringsSep "\n" (lib.mapAttrsToList (name: pkg:
+        if name != "generate-docs" then ''
+          ### ${name}
 
-  # Get all packages
-  allPackages = nixpkgsExtraFlake.packages.${system};
+          ${pkg.meta.description or "No description available."}
 
-  # Generate package documentation
-  packagesDoc = lib.concatStringsSep "\n" (lib.mapAttrsToList (name: pkg: ''
-    ### ${name}
+          - **License**: ${pkg.meta.license.shortName or "Unknown"}
+          - **Homepage**: [${pkg.meta.homepage or "N/A"}](${pkg.meta.homepage or "#"})
+          - **Maintainers**: ${toString (builtins.map (m: m.name) (pkg.meta.maintainers or []))}
+        '' else ""
+      ) packages);
 
-    ${pkg.meta.description or "No description available."}
+      # Final output without date (will be added at build time)
+      markdown = ''
+        # Nixpkgs-Extra Documentation
 
-    - **License**: ${pkg.meta.license.shortName or "Unknown"}
-    - **Homepage**: [${pkg.meta.homepage or "N/A"}](${pkg.meta.homepage or "#"})
-    - **Maintainers**: ${toString (builtins.map (m: m.name) (pkg.meta.maintainers or []))}
-  '') allPackages);
+        *Automatically generated on DATE_PLACEHOLDER*
 
-  # Generate modules documentation
-  # For each NixOS module, we'd need to extract options
-  # This is a simplified version - for more complete docs, you'd use nixosOptionsDoc
+        ## Available Packages
 
-  # Final output
-  markdown = ''
-    # Nixpkgs-Extra Documentation
+        ${packagesDoc}
+      '';
 
-    *Automatically generated on ${builtins.substring 0 10 (builtins.toString builtins.currentTime)}*
-
-    ## Available Packages
-
-    ${packagesDoc}
-
-    ## Available NixOS Modules
-
-    *Coming soon*
-  '';
-
-  # Write to file
-  docsFile = pkgs.writeTextFile {
-    name = "nixpkgs-extra-docs";
-    text = markdown;
-    destination = "/docs/PACKAGES.md";
-  };
-
-in pkgs.runCommand "nixpkgs-extra-docs" {} ''
-  mkdir -p $out
-  cp -r ${docsFile}/docs $out/
-''
+      # Write to file
+      docsFile = pkgs.writeTextFile {
+        name = "nixpkgs-extra-docs";
+        text = markdown;
+        destination = "/docs/README.md";
+      };
+    in pkgs.runCommand "nixpkgs-extra-docs" {} ''
+      mkdir -p $out/docs
+      DATE=$(date +%Y-%m-%d)
+      cat ${docsFile}/docs/README.md | sed "s/DATE_PLACEHOLDER/$DATE/g" > $out/docs/README.md
+    '';
+in
+  # Return the function so it can be called with appropriate packages
+  generateDocs
