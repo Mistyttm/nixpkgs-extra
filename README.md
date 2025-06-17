@@ -1,6 +1,6 @@
 # nixpkgs-extra
 
-Some extra packages I make for myself that I don't feel like upstreaming atm
+Some extra packages and modules I make for myself that I don't feel like upstreaming atm
 
 ## Installation
 
@@ -35,6 +35,7 @@ outputs = inputs@{ nixpkgs-extra, ... }: {
 ```
 
 > [!NOTE]
+>
 > - You can choose to use either the overlay or the module, depending on your needs. Both are optional and can be used independently.
 > - The overlay provides additional packages, while the module integrates system-level configurations.
 
