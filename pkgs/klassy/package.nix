@@ -1,8 +1,8 @@
 {
   lib,
-  stdenv,
+  mkKdeDerivation,
   fetchFromGitHub, cmake, gettext, pkg-config, libX11, wayland, wayland-protocols, kdePackages}:
-stdenv.mkDerivation {
+mkKdeDerivation {
   name = "klassy";
   version = "6.4.breeze6.4.0";
   src = fetchFromGitHub {
