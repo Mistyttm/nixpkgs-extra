@@ -1,6 +1,6 @@
 # Nixpkgs-Extra Documentation
 
-*Automatically generated on 2025-07-10*
+*Automatically generated on 2025-08-12*
 
 ## Available Packages
 
@@ -10,6 +10,13 @@ A highly customizable binary Window Decoration, Application Style and Global The
 
 - **License**: gpl3Plus
 - **Homepage**: [https://github.com/paulmcauley/klassy](https://github.com/paulmcauley/klassy)
+
+### steam-presence
+
+Display your currently played Steam game in Discord
+
+- **License**: gpl3Plus
+- **Homepage**: [https://github.com/JustTemmie/steam-presence](https://github.com/JustTemmie/steam-presence)
 
 ### vpm
 
