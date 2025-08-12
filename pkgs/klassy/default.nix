@@ -1,1 +1,1 @@
-{ callPackage }: callPackage ./package.nix { }
+{ kdePackages }: kdePackages.callPackage ./package.nix { }

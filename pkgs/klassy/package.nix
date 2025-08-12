@@ -3,7 +3,7 @@
   mkKdeDerivation,
   fetchFromGitHub, cmake, gettext, pkg-config, libX11, wayland, wayland-protocols, kdePackages}:
 mkKdeDerivation {
-  name = "klassy";
+  pname = "klassy";
   version = "6.4.breeze6.4.0";
   src = fetchFromGitHub {
     owner = "paulmcauley";
