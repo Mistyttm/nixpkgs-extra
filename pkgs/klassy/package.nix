@@ -63,6 +63,10 @@ mkKdeDerivation {
     "-DBUILD_QT5=OFF"
   ];
 
+  outputs = [ "out" ];
+
+  dontWrapQtApps = true;
+
   meta = with lib; {
     description = "A highly customizable binary Window Decoration, Application Style and Global Theme plugin for recent versions of the KDE Plasma desktop";
     homepage = "https://github.com/paulmcauley/klassy";
