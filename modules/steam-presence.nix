@@ -2,12 +2,15 @@
   config,
   lib,
   pkgs,
+  ...
 }:
 with lib;
 let
   cfg = config.programs.steam-presence;
 
   defaultPackage = pkgs.steam-presence or (pkgs.callPackage ../pkgs/steam-presence { });
+
+  yamlFormat = pkgs.formats.yaml { };
 in
 {
   meta.maintainers = with maintainers; [ mistyttm ];
@@ -39,20 +42,14 @@ in
     };
 
     settings = mkOption {
-      type = types.attrs;
-      default = { };
-      example = literalExpression ''
-        {
-          update_interval = 15;
-          show_game_details = true;
-        }
-      '';
-      description = ''
-        Configuration options for Steam Presence.
+      type = yamlFormat.type;
+      default = {};
+      description = "Settings to be written to the YAML config file for myService.";
+    };
 
-        These settings will be written to a configuration file that
-        Steam Presence can read.
-      '';
+    secretSettingsFile = lib.mkOption {
+      type = lib.types.path;
+      description = "Path to a YAML or JSON file containing secret values, managed by sops-nix.";
     };
   };
 
@@ -61,9 +58,8 @@ in
     home.packages = [ cfg.package ];
 
     # Create config file if settings are provided
-    home.file.".config/steam-presence/config.json" = mkIf (cfg.settings != { }) {
-      text = builtins.toJSON cfg.settings;
-    };
+    home.file."~/.config/my-service/config.yaml".source = yamlFormat.generate "my-service-config.yaml" config.myService.settings;
+
 
     # Systemd user service for auto-starting
     systemd.user.services.steam-presence = mkIf cfg.autoStart {
