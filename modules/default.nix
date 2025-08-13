@@ -1,7 +1,7 @@
 {
   default = { ... }: {
     imports = [
-      ./steam-presence.nix
+      # ./steam-presence.nix
     ];
   };
 }
