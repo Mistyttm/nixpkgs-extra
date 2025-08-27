@@ -26,14 +26,14 @@
 };
 in buildPythonPackage rec {
   pname = "steam-presence";
-  version = "1.12.1";
+  version = "v1.12.2";
   format = "other";
 
   src = fetchFromGitHub {
     owner = "JustTemmie";
     repo = "steam-presence";
-    rev = "v1.12.1";
-    hash = "sha256-8xPPvtmtx5Lq41N0FFTUZwHSkcKaH48wW9OOHEL3ON0=";
+    rev = "5439cfe35e154f7a80c6a6b1fc160d2b431a7584";
+    hash = "sha256-6w8ZsLc0+p0EByNhbs10+5AWvOiEmIE1eyxoN4VHYhQ=";
   };
 
   propagatedBuildInputs = [
@@ -44,17 +44,21 @@ in buildPythonPackage rec {
     python-steamgriddb
   ];
 
+  patches = [
+    ./0001-feat-convert-absolute-baths-to-use-the-xdg-spec.patch
+  ];
+
   doCheck = false;
 
   installPhase = ''
     runHook preInstall
-    
+
     mkdir -p $out/bin
     mkdir -p $out/${python.sitePackages}/steam_presence
-    
+
     # Copy all Python files to the package directory
     find . -name "*.py" -exec cp {} $out/${python.sitePackages}/steam_presence/ \;
-    
+
     # Look for the main script and create a wrapper
     if [ -f "main.py" ]; then
       cat > $out/bin/steam-presence << EOF
@@ -83,9 +87,9 @@ os.chdir('$out/${python.sitePackages}/steam_presence')
 exec(open('$(ls $out/${python.sitePackages}/steam_presence/*.py | head -1)').read())
 EOF
     fi
-    
+
     chmod +x $out/bin/steam-presence
-    
+
     runHook postInstall
   '';
 
