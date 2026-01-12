@@ -25,9 +25,12 @@
   nix-update-script,
 }:
 
-buildPythonApplication rec {
-  pname = "jackify";
+let
   version = "0.2.0.10";
+in
+buildPythonApplication {
+  pname = "jackify";
+  inherit version;
   pyproject = true;
 
   src = fetchFromGitHub {
@@ -123,7 +126,7 @@ buildPythonApplication rec {
     })
   ];
 
-  meta = with lib; {
+  meta = {
     description = "Wabbajack modlist installation and configuration tool for Linux";
     longDescription = ''
       Jackify is a Linux-native application for installing and configuring
@@ -132,9 +135,9 @@ buildPythonApplication rec {
       and Proton prefix configuration.
     '';
     homepage = "https://github.com/Omni-guides/Jackify";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [ mistyttm ];
-    platforms = platforms.linux;
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [ mistyttm ];
+    platforms = lib.platforms.linux;
     mainProgram = "jackify";
   };
 

@@ -11,12 +11,12 @@ buildDotnetGlobalTool {
 
   nugetSha256 = "sha256-Pz8KBpjmpzx+6gD4nqGVBEp5z4UX6hFqZHGy8hJCD4k=";
 
-  meta = with lib; {
+  meta = {
     description = "VRChat Package Manager CLI";
-    maintainers = with maintainers; [ mistyttm ];
+    maintainers = with lib.maintainers; [ mistyttm ];
     homepage = "https://vcc.docs.vrchat.com/vpm/cli";
-    license = licenses.unfree;
-    platforms = platforms.linux;
+    license = lib.licenses.unfree;
+    platforms = lib.platforms.linux;
   };
 
   passthru.updateScript = nix-update-script { };

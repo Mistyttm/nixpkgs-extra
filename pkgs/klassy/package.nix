@@ -76,12 +76,12 @@ mkKdeDerivation {
 
   dontWrapQtApps = true;
 
-  meta = with lib; {
+  meta = {
     description = "A highly customizable binary Window Decoration, Application Style and Global Theme plugin for recent versions of the KDE Plasma desktop";
     homepage = "https://github.com/paulmcauley/klassy";
-    license = licenses.gpl3Plus;
-    maintainers = with maintainers; [ misty_ttm ];
-    platforms = platforms.linux;
+    license = lib.licenses.gpl3Plus;
+    maintainers = with lib.maintainers; [ misty_ttm ];
+    platforms = lib.platforms.linux;
   };
 
   passthru.updateScript = nix-update-script { };

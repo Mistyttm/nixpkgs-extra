@@ -13,13 +13,14 @@
   nix-update-script,
 }:
 let
-  python-steamgriddb = buildPythonPackage rec {
+  python-steamgriddb = buildPythonPackage {
     pname = "python-steamgriddb";
     version = "1.0.5";
     format = "pyproject";
 
     src = fetchPypi {
-      inherit version pname;
+      pname = "python-steamgriddb";
+      version = "1.0.5";
       hash = "sha256-A223uwmGXac7QLaM8E+5Z1zRi0kIJ1CS2R83vxYkUGk=";
     };
 
@@ -32,14 +33,14 @@ let
       requests
     ];
 
-    meta = with lib; {
+    meta = {
       description = "Python library for SteamGridDB API";
       homepage = "https://pypi.org/project/python-steamgriddb/";
-      license = licenses.mit;
+      license = lib.licenses.mit;
     };
   };
 in
-buildPythonPackage rec {
+buildPythonPackage {
   pname = "steam-presence";
   version = "v1.12.2";
   format = "other";
@@ -108,11 +109,11 @@ buildPythonPackage rec {
         runHook postInstall
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Display your currently played Steam game in Discord";
     homepage = "https://github.com/JustTemmie/steam-presence";
-    license = licenses.gpl3Plus; # Check the actual license
-    maintainers = with maintainers; [ mistyttm ];
+    license = lib.licenses.gpl3Plus; # Check the actual license
+    maintainers = with lib.maintainers; [ mistyttm ];
   };
 
   passthru.updateScript = nix-update-script {
