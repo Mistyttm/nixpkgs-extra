@@ -1,0 +1,16 @@
+diff --git a/jackify/backend/services/nexus_oauth_service.py b/jackify/backend/services/nexus_oauth_service.py
+index a1b2c3d..e5f6g7h 100644
+--- a/jackify/backend/services/nexus_oauth_service.py
++++ b/jackify/backend/services/nexus_oauth_service.py
+@@ -58,7 +58,10 @@ class NexusOAuthService:
+         code_challenge = base64.urlsafe_b64encode(hash_object.digest()).decode('utf-8').rstrip('=')
+         return code_verifier, code_challenge, state
+ 
+-    def _ensure_protocol_registered(self) -> bool:
++    def _ensure_protocol_registered(self) -> bool:
++        return True
++
++    def _unused_ensure_protocol_registered(self) -> bool:
+         """
+         Ensure jackify:// protocol is registered
+ 

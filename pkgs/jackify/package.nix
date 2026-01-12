@@ -27,10 +27,12 @@
   libnotify,
   # Update script
   nix-update-script,
+  callPackage,
 }:
 
 let
   version = "0.2.0.10";
+  jackify-engine = callPackage ./engine.nix { };
 in
 buildPythonApplication {
   pname = "jackify";
@@ -59,6 +61,11 @@ buildPythonApplication {
     qt6.qtwayland
   ];
 
+  patches = [
+    ./disable-protocol-registration.patch
+    ./add-pyproject.patch
+  ];
+
   dependencies = [
     pyside6
     psutil
@@ -71,35 +78,12 @@ buildPythonApplication {
     cryptography
   ];
 
-  # Create a minimal pyproject.toml since upstream doesn't have one
-  postPatch = ''
-    cat > pyproject.toml << EOF
-    [build-system]
-    requires = ["setuptools", "wheel"]
-    build-backend = "setuptools.build_meta"
-
-    [project]
-    name = "jackify"
-    version = "${version}"
-    description = "Wabbajack modlist installation and configuration tool for Linux"
-    requires-python = ">=3.8"
-
-    [project.scripts]
-    jackify = "jackify.__main__:main"
-
-    [tool.setuptools.packages.find]
-    where = ["."]
-    include = ["jackify*"]
-    EOF
-
-    # Create __init__.py with version if it doesn't have one
-    if ! grep -q "__version__" jackify/__init__.py 2>/dev/null; then
-      echo '__version__ = "${version}"' > jackify/__init__.py
-    fi
-  '';
-
   # Skip tests as there aren't any defined
   doCheck = false;
+
+  passthru = {
+    inherit jackify-engine;
+  };
 
   # Ensure Qt wrapper picks up the Python app
   dontWrapQtApps = true;
@@ -115,22 +99,14 @@ buildPythonApplication {
   # Wrap the executable with Qt environment variables and runtime dependencies
   postFixup = ''
     wrapQtApp $out/bin/jackify \
-      --prefix PATH : ${lib.makeBinPath [ xdg-utils libnotify ]}
-
-    # Create protocol handler desktop file for OAuth callback
-    mkdir -p $out/share/applications
-    cat > $out/share/applications/com.jackify.app.desktop << EOF
-[Desktop Entry]
-Type=Application
-Name=Jackify Protocol Handler
-Comment=Wabbajack modlist manager for Linux - OAuth callback handler
-Exec=$out/bin/jackify %u
-Icon=com.jackify.app
-Terminal=false
-Categories=Game;Utility;
-MimeType=x-scheme-handler/jackify;
-NoDisplay=true
-EOF
+      --set JACKIFY_ENGINE_PATH "${jackify-engine}/bin/jackify-engine" \
+      --prefix PATH : ${
+        lib.makeBinPath [
+          xdg-utils
+          libnotify
+          jackify-engine
+        ]
+      }
   '';
 
   desktopItems = [
