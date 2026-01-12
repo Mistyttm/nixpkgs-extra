@@ -71,6 +71,9 @@ mkKdeDerivation {
     "-DBUILD_QT5=OFF"
   ];
 
+  # Disable extra outputs that klassy doesn't produce
+  outputs = [ "out" "dev" ];
+
   dontWrapQtApps = true;
 
   meta = {
