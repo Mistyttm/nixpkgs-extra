@@ -113,7 +113,6 @@ buildPythonPackage {
     description = "Display your currently played Steam game in Discord";
     homepage = "https://github.com/JustTemmie/steam-presence";
     license = lib.licenses.gpl3Plus; # Check the actual license
-    maintainers = with lib.maintainers; [ mistyttm ];
     platforms = lib.platforms.linux;
     mainProgram = "steam-presence";
   };

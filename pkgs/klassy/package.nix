@@ -77,7 +77,6 @@ mkKdeDerivation {
     description = "A highly customizable binary Window Decoration, Application Style and Global Theme plugin for recent versions of the KDE Plasma desktop";
     homepage = "https://github.com/paulmcauley/klassy";
     license = lib.licenses.gpl3Plus;
-    maintainers = with lib.maintainers; [ misty_ttm ];
     platforms = lib.platforms.linux;
     mainProgram = "klassy";
   };

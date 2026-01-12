@@ -136,7 +136,6 @@ buildPythonApplication {
     '';
     homepage = "https://github.com/Omni-guides/Jackify";
     license = lib.licenses.gpl3Only;
-    maintainers = with lib.maintainers; [ mistyttm ];
     platforms = lib.platforms.linux;
     mainProgram = "jackify";
   };
