@@ -13,7 +13,7 @@ The flake is configured with `nixConfig` to automatically use the cache when `ac
 ### Option 2: Add the cache manually
 
 ```bash
-cachix use nixpkgs-extra
+cachix use misty-nixpkgs-extra
 ```
 
 Or add to your NixOS configuration:
@@ -21,8 +21,8 @@ Or add to your NixOS configuration:
 ```nix
 {
   nix.settings = {
-    substituters = [ "https://nixpkgs-extra.cachix.org" ];
-    trusted-public-keys = [ "nixpkgs-extra.cachix.org-1:PLACEHOLDER_KEY" ];
+    substituters = [ "https://misty-nixpkgs-extra.cachix.org" ];
+    trusted-public-keys = [ "misty-nixpkgs-extra.cachix.org-1:IaGsrS6TyLFv+wkdYjjWaY9lB2vywnmM7qUZw01kPj0=" ];
   };
 }
 ```
