@@ -1,6 +1,6 @@
 {
-  buildPythonPackage,
   lib,
+  buildPythonPackage,
   fetchFromGitHub,
   fetchPypi,
   pypresence,
@@ -16,7 +16,7 @@ let
   python-steamgriddb = buildPythonPackage {
     pname = "python-steamgriddb";
     version = "1.0.5";
-    format = "pyproject";
+    pyproject = true;
 
     src = fetchPypi {
       pname = "python-steamgriddb";
@@ -24,12 +24,12 @@ let
       hash = "sha256-A223uwmGXac7QLaM8E+5Z1zRi0kIJ1CS2R83vxYkUGk=";
     };
 
-    nativeBuildInputs = [
+    build-system = [
       setuptools
       wheel
     ];
 
-    propagatedBuildInputs = [
+    dependencies = [
       requests
     ];
 
@@ -42,7 +42,7 @@ let
 in
 buildPythonPackage {
   pname = "steam-presence";
-  version = "v1.12.2";
+  version = "1.12.2";
   format = "other";
 
   src = fetchFromGitHub {
@@ -52,7 +52,7 @@ buildPythonPackage {
     hash = "sha256-6w8ZsLc0+p0EByNhbs10+5AWvOiEmIE1eyxoN4VHYhQ=";
   };
 
-  propagatedBuildInputs = [
+  dependencies = [
     pypresence
     beautifulsoup4
     requests
@@ -114,6 +114,8 @@ buildPythonPackage {
     homepage = "https://github.com/JustTemmie/steam-presence";
     license = lib.licenses.gpl3Plus; # Check the actual license
     maintainers = with lib.maintainers; [ mistyttm ];
+    platforms = lib.platforms.linux;
+    mainProgram = "steam-presence";
   };
 
   passthru.updateScript = nix-update-script {

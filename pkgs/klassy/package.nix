@@ -65,14 +65,11 @@ mkKdeDerivation {
   ];
 
   cmakeFlags = [
-    "-DCMAKE_BUILD_TYPE=Release"
     "-DBUILD_TESTING=OFF"
     "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON"
     "-DBUILD_QT6=ON"
     "-DBUILD_QT5=OFF"
   ];
-
-  outputs = [ "out" ];
 
   dontWrapQtApps = true;
 
@@ -82,6 +79,7 @@ mkKdeDerivation {
     license = lib.licenses.gpl3Plus;
     maintainers = with lib.maintainers; [ misty_ttm ];
     platforms = lib.platforms.linux;
+    mainProgram = "klassy";
   };
 
   passthru.updateScript = nix-update-script { };
