@@ -15,12 +15,16 @@
   pyyaml,
   vdf,
   packaging,
+  cryptography,
   # For desktop file
   copyDesktopItems,
   makeDesktopItem,
   # For Qt wrapping
   qt6,
   makeWrapper,
+  # Runtime tools
+  xdg-utils,
+  libnotify,
   # Update script
   nix-update-script,
 }:
@@ -64,6 +68,7 @@ buildPythonApplication {
     pyyaml
     vdf
     packaging
+    cryptography
   ];
 
   # Create a minimal pyproject.toml since upstream doesn't have one
@@ -107,17 +112,34 @@ buildPythonApplication {
     fi
   '';
 
-  # Wrap the executable with Qt environment variables
+  # Wrap the executable with Qt environment variables and runtime dependencies
   postFixup = ''
-    wrapQtApp $out/bin/jackify
+    wrapQtApp $out/bin/jackify \
+      --prefix PATH : ${lib.makeBinPath [ xdg-utils libnotify ]}
+
+    # Create protocol handler desktop file for OAuth callback
+    mkdir -p $out/share/applications
+    cat > $out/share/applications/com.jackify.app.desktop << EOF
+[Desktop Entry]
+Type=Application
+Name=Jackify Protocol Handler
+Comment=Wabbajack modlist manager for Linux - OAuth callback handler
+Exec=$out/bin/jackify %u
+Icon=com.jackify.app
+Terminal=false
+Categories=Game;Utility;
+MimeType=x-scheme-handler/jackify;
+NoDisplay=true
+EOF
   '';
 
   desktopItems = [
     (makeDesktopItem {
       name = "jackify";
-      exec = "jackify";
+      exec = "jackify %u";
       desktopName = "Jackify";
       comment = "Wabbajack modlist installation and configuration tool for Linux";
+      mimeTypes = [ "x-scheme-handler/jackify" ];
       categories = [
         "Game"
         "Utility"
