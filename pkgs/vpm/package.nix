@@ -1,4 +1,8 @@
-{ buildDotnetGlobalTool, lib }:
+{
+  buildDotnetGlobalTool,
+  lib,
+  nix-update-script,
+}:
 buildDotnetGlobalTool {
   pname = "vpm";
   version = "0.1.28";
@@ -14,4 +18,6 @@ buildDotnetGlobalTool {
     license = licenses.unfree;
     platforms = platforms.linux;
   };
+
+  passthru.updateScript = nix-update-script { };
 }

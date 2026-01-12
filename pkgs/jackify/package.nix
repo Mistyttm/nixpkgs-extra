@@ -21,6 +21,8 @@
   # For Qt wrapping
   qt6,
   makeWrapper,
+  # Update script
+  nix-update-script,
 }:
 
 buildPythonApplication rec {
@@ -135,4 +137,6 @@ buildPythonApplication rec {
     platforms = platforms.linux;
     mainProgram = "jackify";
   };
+
+  passthru.updateScript = nix-update-script { };
 }

@@ -1,7 +1,16 @@
 {
   lib,
   mkKdeDerivation,
-  fetchFromGitHub, cmake, gettext, pkg-config, libX11, wayland, wayland-protocols, kdePackages}:
+  fetchFromGitHub,
+  cmake,
+  gettext,
+  pkg-config,
+  libX11,
+  wayland,
+  wayland-protocols,
+  kdePackages,
+  nix-update-script,
+}:
 mkKdeDerivation {
   pname = "klassy";
   version = "6.4.breeze6.4.0";
@@ -74,4 +83,6 @@ mkKdeDerivation {
     maintainers = with maintainers; [ misty_ttm ];
     platforms = platforms.linux;
   };
+
+  passthru.updateScript = nix-update-script { };
 }
