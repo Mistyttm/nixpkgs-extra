@@ -1,7 +1,11 @@
 {
   lib,
   buildDotnetGlobalTool,
-  nix-update-script,
+  writeShellScript,
+  curl,
+  jq,
+  nix-prefetch,
+  gnused,
 }:
 buildDotnetGlobalTool {
   pname = "vpm";
@@ -15,10 +19,9 @@ buildDotnetGlobalTool {
     description = "VRChat Package Manager CLI";
     homepage = "https://vcc.docs.vrchat.com/vpm/cli";
     license = lib.licenses.unfree;
-    maintainers = with lib.maintainers; [ mistyttm ];
     platforms = lib.platforms.linux;
     mainProgram = "vpm";
   };
 
-  passthru.updateScript = nix-update-script { };
+  passthru.updateScript = ./update.sh;
 }

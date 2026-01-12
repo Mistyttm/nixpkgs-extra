@@ -38,6 +38,19 @@ jobs:
               continue
             fi
             
+            # Use custom update script for vpm (NuGet package)
+            if [ "$pkg" = "vpm" ]; then
+              echo "Attempting to update $pkg with custom script..."
+              bash ./pkgs/vpm/update.sh || echo "$pkg: no update available or update failed"
+              if git diff --quiet; then
+                echo "$pkg: no changes"
+              else
+                git add -A
+                git commit -m "vpm: update to latest version" || true
+              fi
+              continue
+            fi
+            
             echo "Attempting to update $pkg..."
             nix-update --flake --commit "$pkg" || echo "$pkg: no update available or update failed"
           done
