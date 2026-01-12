@@ -2,6 +2,31 @@
 
 Some extra packages and modules I make for myself that I don't feel like upstreaming atm
 
+## Binary Cache
+
+This repository uses [Cachix](https://cachix.org) to provide pre-built binaries. To use the cache, you can either:
+
+### Option 1: Use the flake directly (recommended)
+
+The flake is configured with `nixConfig` to automatically use the cache when `accept-flake-config` is enabled.
+
+### Option 2: Add the cache manually
+
+```bash
+cachix use nixpkgs-extra
+```
+
+Or add to your NixOS configuration:
+
+```nix
+{
+  nix.settings = {
+    substituters = [ "https://nixpkgs-extra.cachix.org" ];
+    trusted-public-keys = [ "nixpkgs-extra.cachix.org-1:PLACEHOLDER_KEY" ];
+  };
+}
+```
+
 ## Installation
 
 To use `nixpkgs-extra` in your Nix setup, follow these steps:
