@@ -18,6 +18,8 @@ jobs:
       - uses: cachix/install-nix-action@v30
         with:
           nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: |
+            experimental-features = nix-command flakes
 
       - uses: cachix/cachix-action@v15
         with:
@@ -25,8 +27,10 @@ jobs:
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
 
       - name: Build all packages
+        env:
+          NIXPKGS_ALLOW_UNFREE: 1
         run: |
-          nix flake check
+          nix flake check --impure
           for pkg in $(nix flake show --json 2>/dev/null | jq -r '.packages."x86_64-linux" | keys[]' 2>/dev/null); do
             echo "Building $pkg..."
             nix build .#"$pkg" --print-build-logs
