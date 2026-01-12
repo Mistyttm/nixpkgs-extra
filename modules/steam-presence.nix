@@ -43,7 +43,7 @@ in
 
     settings = mkOption {
       type = yamlFormat.type;
-      default = {};
+      default = { };
       description = "Settings to be written to the YAML config file for myService.";
     };
 
@@ -58,8 +58,8 @@ in
     home.packages = [ cfg.package ];
 
     # Create config file if settings are provided
-    home.file."~/.config/my-service/config.yaml".source = yamlFormat.generate "my-service-config.yaml" config.myService.settings;
-
+    home.file."~/.config/my-service/config.yaml".source =
+      yamlFormat.generate "my-service-config.yaml" config.myService.settings;
 
     # Systemd user service for auto-starting
     systemd.user.services.steam-presence = mkIf cfg.autoStart {

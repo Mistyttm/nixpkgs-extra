@@ -1,7 +1,9 @@
 {
-  default = { ... }: {
-    imports = [
-      # ./steam-presence.nix
-    ];
-  };
+  default =
+    { ... }:
+    {
+      imports = [
+        # ./steam-presence.nix
+      ];
+    };
 }

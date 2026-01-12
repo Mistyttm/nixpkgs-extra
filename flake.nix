@@ -7,7 +7,9 @@
 
   nixConfig = {
     extra-substituters = [ "https://misty-nixpkgs-extra.cachix.org" ];
-    extra-trusted-public-keys = [ "misty-nixpkgs-extra.cachix.org-1:IaGsrS6TyLFv+wkdYjjWaY9lB2vywnmM7qUZw01kPj0=" ];
+    extra-trusted-public-keys = [
+      "misty-nixpkgs-extra.cachix.org-1:IaGsrS6TyLFv+wkdYjjWaY9lB2vywnmM7qUZw01kPj0="
+    ];
   };
 
   outputs =
@@ -28,9 +30,10 @@
         let
           myOverlay = self.overlays.default;
           myPackages = myOverlay pkgs pkgs;
-          docsGenerator = pkgs.callPackage ./docs/generate.nix {};
+          docsGenerator = pkgs.callPackage ./docs/generate.nix { };
         in
-        myPackages // {
+        myPackages
+        // {
           # Add documentation generator
           generate-docs = docsGenerator {
             packages = myPackages;
