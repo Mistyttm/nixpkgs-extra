@@ -62,7 +62,7 @@ buildPythonApplication {
   ];
 
   patches = [
-    ./disable-protocol-registration.patch
+    ./fix-protocol-registration.patch
     ./add-pyproject.patch
     ./disable-auto-update.patch
     ./fix-protocol-handler.patch

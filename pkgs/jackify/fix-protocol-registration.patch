@@ -1,0 +1,211 @@
+--- a/jackify/backend/services/nexus_oauth_service.py
++++ b/jackify/backend/services/nexus_oauth_service.py
+@@ -78,106 +78,17 @@
+         return code_verifier, code_challenge, state
+ 
+     def _ensure_protocol_registered(self) -> bool:
+-        """
+-        Ensure jackify:// protocol is registered with the OS
+-
+-        Returns:
+-            True if registration successful or already registered
+-        """
++        """Ensure jackify:// protocol is registered"""
++        import sys
++        import shutil
+         import subprocess
+-        import sys
+         from pathlib import Path
+ 
+-        if not sys.platform.startswith('linux'):
+-            logger.debug("Protocol registration only needed on Linux")
+-            return True
+-
+         try:
+-            # Ensure desktop file exists and has correct Exec path
+-            desktop_file = Path.home() / ".local" / "share" / "applications" / "com.jackify.app.desktop"
+-
+-            # Get environment for AppImage detection
+-            env = os.environ
++            # Point to current executable (wrapper script in Nix)
++            exec_path = str(Path(sys.argv[0]).resolve())
+             
+-            # Determine executable path (DEV mode vs AppImage)
+-            # Check multiple indicators for AppImage execution
+-            is_appimage = (
+-                'APPIMAGE' in env or              # AppImage environment variable
+-                'APPDIR' in env or               # AppImage directory variable
+-                (sys.argv[0] and sys.argv[0].endswith('.AppImage'))  # Executable name
+-            )
+-            
+-            if is_appimage:
+-                # Running from AppImage - use the AppImage path directly
+-                # CRITICAL: Never use -m flag in AppImage mode - it causes __main__.py windows
+-                if 'APPIMAGE' in env:
+-                    # APPIMAGE env var gives us the exact path to the AppImage
+-                    exec_path = env['APPIMAGE']
+-                    logger.info(f"Using APPIMAGE env var: {exec_path}")
+-                elif sys.argv[0] and Path(sys.argv[0]).exists():
+-                    # Use sys.argv[0] if it's a valid path
+-                    exec_path = str(Path(sys.argv[0]).resolve())
+-                    logger.info(f"Using resolved sys.argv[0]: {exec_path}")
+-                else:
+-                    # Fallback to sys.argv[0] as-is
+-                    exec_path = sys.argv[0]
+-                    logger.warning(f"Using sys.argv[0] as fallback: {exec_path}")
+-            else:
+-                # Running from source (DEV mode)
+-                # Need to ensure we run from the correct directory
+-                src_dir = Path(__file__).parent.parent.parent.parent  # Go up to src/
+-                # Use bash -c with proper quoting for paths with spaces
+-                exec_path = f'bash -c \'cd "{src_dir}" && "{sys.executable}" -m jackify.frontends.gui "$@"\' --'
+-                logger.info(f"DEV mode exec path: {exec_path}")
+-                logger.info(f"Source directory: {src_dir}")
+-
+-            # Check if desktop file needs creation or update
+-            needs_update = False
+-            if not desktop_file.exists():
+-                needs_update = True
+-                logger.info("Creating desktop file for protocol handler")
+-            else:
+-                # Check if Exec path matches current mode
+-                current_content = desktop_file.read_text()
+-                # Check for both quoted (AppImage) and unquoted (DEV mode with bash -c) formats
+-                if is_appimage:
+-                    expected_exec = f'Exec="{exec_path}" %u'
+-                else:
+-                    expected_exec = f"Exec={exec_path} %u"
+-
+-                if expected_exec not in current_content:
+-                    needs_update = True
+-                    logger.info(f"Updating desktop file with new Exec path: {exec_path}")
+-
+-                # Explicitly detect and fix malformed entries (unquoted paths with spaces)
+-                # Check if any Exec line exists without quotes but contains spaces
+-                if is_appimage and ' ' in exec_path:
+-                    import re
+-                    # Look for Exec=<path with spaces> without quotes
+-                    if re.search(r'Exec=[^"]\S*\s+\S*\.AppImage', current_content):
+-                        needs_update = True
+-                        logger.info("Fixing malformed desktop file (unquoted path with spaces)")
+-
+-            if needs_update:
+-                desktop_file.parent.mkdir(parents=True, exist_ok=True)
+-
+-                # Build desktop file content with proper working directory
+-                if is_appimage:
+-                    # AppImage - quote path to handle spaces
+-                    desktop_content = f"""[Desktop Entry]
+-Type=Application
+-Name=Jackify
+-Comment=Wabbajack modlist manager for Linux
+-Exec="{exec_path}" %u
+-Icon=com.jackify.app
+-Terminal=false
+-Categories=Game;Utility;
+-MimeType=x-scheme-handler/jackify;
+-"""
+-                else:
+-                    # DEV mode - exec_path already contains bash -c with proper quoting
+-                    src_dir = Path(__file__).parent.parent.parent.parent  # Go up to src/
+-                    desktop_content = f"""[Desktop Entry]
++            desktop_content = f"""[Desktop Entry]
+ Type=Application
+ Name=Jackify
+ Comment=Wabbajack modlist manager for Linux
+@@ -186,73 +97,33 @@
+ Terminal=false
+ Categories=Game;Utility;
+ MimeType=x-scheme-handler/jackify;
+-Path={src_dir}
+ """
++            
++            apps_dir = Path.home() / ".local" / "share" / "applications"
++            apps_dir.mkdir(parents=True, exist_ok=True)
++            # Use jackify.desktop to shadow system/nix profile version
++            desktop_file = apps_dir / "jackify.desktop"
++            
++            with open(desktop_file, 'w') as f:
++                f.write(desktop_content)
+                 
+-                desktop_file.write_text(desktop_content)
+-                logger.info(f"Desktop file written: {desktop_file}")
+-                logger.info(f"Exec path: {exec_path}")
+-                logger.info(f"AppImage mode: {is_appimage}")
+-
+-            # Always ensure full registration (don't trust xdg-settings alone)
+-            # PopOS/Ubuntu need mimeapps.list even if xdg-settings says registered
+-            logger.info("Registering jackify:// protocol handler")
+-
+-            # Update MIME cache (required for Firefox dialog)
+-            apps_dir = Path.home() / ".local" / "share" / "applications"
+-            subprocess.run(
+-                ['update-desktop-database', str(apps_dir)],
+-                capture_output=True,
+-                timeout=10
+-            )
+-
+-            # Set as default handler using xdg-mime (Firefox compatibility)
+-            subprocess.run(
+-                ['xdg-mime', 'default', 'com.jackify.app.desktop', 'x-scheme-handler/jackify'],
+-                capture_output=True,
+-                timeout=10
+-            )
+-
+-            # Also use xdg-settings as backup (some systems need both)
+-            subprocess.run(
+-                ['xdg-settings', 'set', 'default-url-scheme-handler', 'jackify', 'com.jackify.app.desktop'],
+-                capture_output=True,
+-                timeout=10
+-            )
+-
+-            # Manually ensure entry in mimeapps.list (PopOS/Ubuntu require this for GIO)
+-            mimeapps_path = Path.home() / ".config" / "mimeapps.list"
++            # Clean up old manual registrations if they exist
++            old_desktop = apps_dir / "com.jackify.app.desktop"
++            if old_desktop.exists():
++                try:
++                    old_desktop.unlink()
++                except: pass
++            
++            # Try to update database, but ignore failures
+             try:
+-                # Read existing content
+-                if mimeapps_path.exists():
+-                    content = mimeapps_path.read_text()
+-                else:
+-                    mimeapps_path.parent.mkdir(parents=True, exist_ok=True)
+-                    content = "[Default Applications]\n"
+-
+-                # Add jackify handler if not present
+-                if 'x-scheme-handler/jackify=' not in content:
+-                    if '[Default Applications]' not in content:
+-                        content = "[Default Applications]\n" + content
+-
+-                    # Insert after [Default Applications] line
+-                    lines = content.split('\n')
+-                    for i, line in enumerate(lines):
+-                        if line.strip() == '[Default Applications]':
+-                            lines.insert(i + 1, 'x-scheme-handler/jackify=com.jackify.app.desktop')
+-                            break
+-
+-                    content = '\n'.join(lines)
+-                    mimeapps_path.write_text(content)
+-                    logger.info("Added jackify handler to mimeapps.list")
+-            except Exception as e:
+-                logger.warning(f"Failed to update mimeapps.list: {e}")
+-
+-            logger.info("jackify:// protocol registered successfully")
++                subprocess.run(['update-desktop-database', str(apps_dir)], check=False, timeout=5)
++            except Exception:
++                pass
++
++            logger.info("jackify:// protocol registered successfully (shadowing system handler)")
+             return True
+-
+         except Exception as e:
+-            logger.warning(f"Failed to register jackify:// protocol: {e}")
++            logger.error(f"Failed to register protocol: {e}")
+             return False
+ 
+     def _generate_self_signed_cert(self) -> Tuple[Optional[str], Optional[str]]:
