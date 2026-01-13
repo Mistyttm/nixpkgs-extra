@@ -33,7 +33,7 @@
 
 let
   version = "0.2.1";
-  jackify-engine = callPackage ./engine.nix { };
+  jackify-engine = callPackage ./jackify-engine/engine.nix { };
 in
 buildPythonApplication {
   pname = "jackify";
@@ -63,12 +63,12 @@ buildPythonApplication {
   ];
 
   patches = [
-    ./fix-protocol-registration.patch
-    ./add-pyproject.patch
-    ./disable-auto-update.patch
-    ./fix-protocol-handler.patch
-    ./fix-settings-oauth-freeze.patch
-    ./use-steam-run.patch
+    ./patches/fix-protocol-registration.patch
+    ./patches/add-pyproject.patch
+    ./patches/disable-auto-update.patch
+    ./patches/fix-protocol-handler.patch
+    ./patches/fix-settings-oauth-freeze.patch
+    ./patches/use-steam-run.patch
   ];
 
   dependencies = [
