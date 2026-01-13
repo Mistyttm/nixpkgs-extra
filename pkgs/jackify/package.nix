@@ -31,7 +31,7 @@
 }:
 
 let
-  version = "0.2.0.10";
+  version = "0.2.1";
   jackify-engine = callPackage ./engine.nix { };
 in
 buildPythonApplication {
@@ -43,7 +43,7 @@ buildPythonApplication {
     owner = "Omni-guides";
     repo = "Jackify";
     rev = "v${version}";
-    hash = "sha256-OA3uIciM/+KK9HiBcsJZfwF7UqOS5WL4hkCxswQRtlA=";
+    sha256 = "1ff1d0cwlgg63gydrnln0z0624ix2h27jdx9gj5ckrfcx6zh0sfk";
   };
 
   build-system = [
@@ -64,6 +64,7 @@ buildPythonApplication {
   patches = [
     ./disable-protocol-registration.patch
     ./add-pyproject.patch
+    ./disable-auto-update.patch
   ];
 
   dependencies = [

@@ -1,0 +1,15 @@
+diff --git a/jackify/frontends/gui/main.py b/jackify/frontends/gui/main.py
+index 1234567..abcdefg 100644
+--- a/jackify/frontends/gui/main.py
++++ b/jackify/frontends/gui/main.py
+@@ -1589,6 +1589,10 @@ class JackifyMainWindow(QMainWindow):
+     def _check_for_updates_on_startup(self):
+         """Check for updates on startup - non-blocking background check"""
+         try:
++            # Skip update check on NixOS - updates are managed through the package manager
++            if not self.update_service.can_update():
++                debug_print("Skipping update check (not running as AppImage)")
++                return
+             debug_print("Checking for updates on startup...")
+             
+             # Run update check in background thread to avoid blocking GUI startup
