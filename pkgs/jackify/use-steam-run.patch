@@ -1,0 +1,35 @@
+diff --git a/jackify/backend/handlers/wabbajack_installer_handler.py b/jackify/backend/handlers/wabbajack_installer_handler.py
+index 1111111..2222222 100644
+--- a/jackify/backend/handlers/wabbajack_installer_handler.py
++++ b/jackify/backend/handlers/wabbajack_installer_handler.py
+@@ -356,7 +356,7 @@ class WabbajackInstallerHandler:
+         if not compat_data:
+             raise RuntimeError("Could not determine compatdata path")
+ 
+-        proton_bin = proton_path / "proton"
+-        cmd = [str(proton_bin), 'run', str(exe_path)]
++        proton_bin = proton_path / "proton"
++        cmd = ["steam-run", str(proton_bin), 'run', str(exe_path)]
+         if args:
+             cmd.extend(args)
+diff --git a/jackify/backend/services/automated_prefix_service.py b/jackify/backend/services/automated_prefix_service.py
+index 3333333..4444444 100644
+--- a/jackify/backend/services/automated_prefix_service.py
++++ b/jackify/backend/services/automated_prefix_service.py
+@@ -1089,7 +1089,8 @@ class AutomatedPrefixService:
+         
+         # Build the command
+         cmd = [
+-            str(proton_path / "proton"),
++            "steam-run",
++            str(proton_path / "proton"),
+             "run",
+             batch_file_path
+         ]
+@@ -2769,7 +2769,7 @@ class AutomatedPrefixService:
+             logger.info(f"STEAM_COMPAT_DATA_PATH={env['STEAM_COMPAT_DATA_PATH']}")
+             
+             # Run proton run wineboot -u to initialize the prefix
+-            cmd = [str(proton_path), 'run', 'wineboot', '-u']
++            cmd = ["steam-run", str(proton_path), 'run', 'wineboot', '-u']
+             logger.info(f"Running: {' '.join(cmd)}")

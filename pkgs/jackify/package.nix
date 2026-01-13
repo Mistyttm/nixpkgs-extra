@@ -25,6 +25,7 @@
   # Runtime tools
   xdg-utils,
   libnotify,
+  steam-run,
   # Update script
   nix-update-script,
   callPackage,
@@ -67,6 +68,7 @@ buildPythonApplication {
     ./disable-auto-update.patch
     ./fix-protocol-handler.patch
     ./fix-settings-oauth-freeze.patch
+    ./use-steam-run.patch
   ];
 
   dependencies = [
@@ -108,6 +110,7 @@ buildPythonApplication {
           xdg-utils
           libnotify
           jackify-engine
+          steam-run
         ]
       }
   '';
