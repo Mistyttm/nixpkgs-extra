@@ -9,13 +9,13 @@
 
 buildDotnetModule rec {
   pname = "jackify-engine";
-  version = "0.4.5";
+  version = "0.4.6.0";
 
   src = fetchFromGitHub {
     owner = "Omni-guides";
     repo = "dev-jackify-engine";
-    rev = "0b82ee9d07b9f62895231cea9440df0fc47a92ff";
-    sha256 = "0k0nhqmwyinmgy8q0vhd9lqnsxmh6hfb4ay9zvm953w467l6gs27";
+    rev = "209a096268d7f619f71957ea5341d654c93d0a12";
+    sha256 = "0ibyswdcf09ssy972ap84hdfgsa77ixjpy9xqrc4r9sjjzkvd9l0";
   };
 
   projectFile = "jackify-engine/jackify-engine.csproj";

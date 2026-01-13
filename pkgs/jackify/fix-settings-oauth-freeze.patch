@@ -1,0 +1,54 @@
+--- a/jackify/frontends/gui/main.py	2026-01-13 15:02:35.120061518 +1000
++++ b/jackify/frontends/gui/main.py	2026-01-13 15:02:37.573126694 +1000
+@@ -694,11 +694,47 @@
+             progress.show()
+             QApplication.processEvents()
+ 
+-            def show_message(msg):
+-                progress.setLabelText(f"Waiting for authorisation...\n\n{msg}")
+-                QApplication.processEvents()
++            # Create OAuth thread to prevent GUI freeze
++            class OAuthThread(QThread):
++                finished_signal = Signal(bool)
++                message_signal = Signal(str)
++
++                def __init__(self, auth_service, parent=None):
++                    super().__init__(parent)
++                    self.auth_service = auth_service
++                    self._is_cancelled = False
++
++                def run(self):
++                    def show_message(msg):
++                        if not self._is_cancelled:
++                            self.message_signal.emit(msg)
+ 
+-            success = auth_service.authorize_oauth(show_browser_message_callback=show_message)
++                    success = self.auth_service.authorize_oauth(show_browser_message_callback=show_message)
++                    self.finished_signal.emit(success)
++                
++                def cancel(self):
++                    self._is_cancelled = True
++
++            oauth_thread = OAuthThread(auth_service, self)
++            oauth_success = [False]
++
++            def on_finished(res):
++                oauth_success[0] = res
++            
++            oauth_thread.finished_signal.connect(on_finished)
++            oauth_thread.message_signal.connect(lambda msg: progress.setLabelText(f"Waiting for authorisation...\n\n{msg}"))
++            
++            oauth_thread.start()
++            
++            while oauth_thread.isRunning():
++                QApplication.processEvents()
++                if progress.wasCanceled():
++                    oauth_thread.cancel()
++                    oauth_thread.terminate()
++                    break
++                QThread.msleep(50)
++            
++            success = oauth_success[0]
+             progress.close()
+             QApplication.processEvents()
+ 
