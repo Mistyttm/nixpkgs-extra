@@ -26,6 +26,11 @@
   xdg-utils,
   libnotify,
   steam-run,
+  winetricks,
+  cabextract,
+  _7zz,
+  gnutar,
+  unzip,
   # Update script
   nix-update-script,
   callPackage,
@@ -95,6 +100,9 @@ buildPythonApplication {
 
   # Install assets and wrap with Qt environment
   postInstall = ''
+    # Remove bundled binaries to force usage of system tools
+    rm -f jackify/tools/{winetricks,cabextract,7z,7zz}
+
     # Copy GUI assets if they exist
     if [ -d "jackify/frontends/gui/assets" ]; then
       cp -r jackify/frontends/gui/assets $out/${python.sitePackages}/jackify/frontends/gui/
@@ -111,6 +119,11 @@ buildPythonApplication {
           libnotify
           jackify-engine
           steam-run
+          winetricks
+          cabextract
+          _7zz
+          gnutar
+          unzip
         ]
       }
   '';
