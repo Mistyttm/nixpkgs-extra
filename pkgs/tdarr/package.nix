@@ -117,12 +117,12 @@ stdenv.mkDerivation (finalAttrs: {
     rm -rf $out/share/tdarr/{server,node}/assets/app/{ffmpeg,ccextractor}*
 
     for module in server node; do
-      mkdir -p $out/share/tdarr/$module/assets/app/ffmpeg/linux_x64
-      ln -s ${ffmpeg}/bin/ffmpeg $out/share/tdarr/$module/assets/app/ffmpeg/linux_x64/ffmpeg
-      ln -s ${ffmpeg}/bin/ffprobe $out/share/tdarr/$module/assets/app/ffmpeg/linux_x64/ffprobe
+      mkdir -p $out/share/tdarr/$module/assets/app/ffmpeg/${platform}
+      ln -s ${ffmpeg}/bin/ffmpeg $out/share/tdarr/$module/assets/app/ffmpeg/${platform}/ffmpeg
+      ln -s ${ffmpeg}/bin/ffprobe $out/share/tdarr/$module/assets/app/ffmpeg/${platform}/ffprobe
 
-      mkdir -p $out/share/tdarr/$module/assets/app/ccextractor/linux_x64
-      ln -s ${ccextractor}/bin/ccextractor $out/share/tdarr/$module/assets/app/ccextractor/linux_x64/ccextractor
+      mkdir -p $out/share/tdarr/$module/assets/app/ccextractor/${platform}
+      ln -s ${ccextractor}/bin/ccextractor $out/share/tdarr/$module/assets/app/ccextractor/${platform}/ccextractor
     done
 
     makeWrapper $out/share/tdarr/server/Tdarr_Server $out/bin/tdarr-server \
