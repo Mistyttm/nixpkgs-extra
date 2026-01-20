@@ -1,8 +1,15 @@
 # Nixpkgs-Extra Documentation
 
-*Automatically generated on 2025-08-12*
+*Automatically generated on 2026-01-20*
 
 ## Available Packages
+
+### jackify
+
+Wabbajack modlist installation and configuration tool for Linux
+
+- **License**: gpl3Only
+- **Homepage**: [https://github.com/Omni-guides/Jackify](https://github.com/Omni-guides/Jackify)
 
 ### klassy
 
@@ -17,6 +24,13 @@ Display your currently played Steam game in Discord
 
 - **License**: gpl3Plus
 - **Homepage**: [https://github.com/JustTemmie/steam-presence](https://github.com/JustTemmie/steam-presence)
+
+### tdarr
+
+Distributed transcode automation using FFmpeg/HandBrake
+
+- **License**: unfree
+- **Homepage**: [https://tdarr.io](https://tdarr.io)
 
 ### vpm
 
