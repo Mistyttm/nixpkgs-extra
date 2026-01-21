@@ -169,6 +169,7 @@ stdenv.mkDerivation (finalAttrs: {
       --run "cd \"\$rootDataPath\"" \
       --set-default handbrakePath "${handbrake}/bin/HandBrakeCLI" \
       --set-default ffmpegPath "${ffmpeg}/bin/ffmpeg" \
+      --set-default ffprobePath "${ffmpeg}/bin/ffprobe" \
       --set-default mkvpropeditPath "${mkvtoolnix}/bin/mkvpropedit" \
       ${lib.optionalString config.cudaSupport "--set nvidiaHealthCheckPath '${nvtopPkg}/bin/nvtop'"}
   '';
