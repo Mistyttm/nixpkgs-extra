@@ -15,9 +15,9 @@ let
     name: nodeCfg:
     {
       nodeName = nodeCfg.name;
-      serverURL = "http://${toString cfg.serverIP}:${toString cfg.serverPort}";
+      serverURL = "http://${cfg.serverIP}:${toString cfg.serverPort}";
       serverIP = cfg.serverIP;
-      serverPort = toString cfg.serverPort;
+      serverPort = cfg.serverPort;
       pathTranslators = nodeCfg.pathTranslators;
       nodeType = nodeCfg.type;
       unmappedNodeCache =
@@ -36,6 +36,9 @@ let
     // cfg.extraNodeConfig;
 
   serverDataDir = "${cfg.dataDir}/server";
+
+  # Filter enabled nodes
+  enabledNodes = filterAttrs (_: nodeCfg: nodeCfg.enable) cfg.nodes;
 
 in
 {
@@ -269,17 +272,17 @@ in
     ]
     ++ (mapAttrsToList (
       nodeId: _: "d ${cfg.dataDir}/nodes/${nodeId} 0750 ${cfg.user} ${cfg.group} -"
-    ) cfg.nodes)
+    ) enabledNodes)
     ++ (mapAttrsToList (
       nodeId: _: "d ${cfg.dataDir}/nodes/${nodeId}/configs 0750 ${cfg.user} ${cfg.group} -"
-    ) cfg.nodes);
+    ) enabledNodes);
 
     systemd.services = {
       tdarr-server = {
         description = "Tdarr Server";
         after = [ "network.target" ];
         wantedBy = [ "multi-user.target" ];
-        environment.rootDataPath = serverDataDir;
+        environment.rootDataPath = toString serverDataDir;
         serviceConfig = {
           User = cfg.user;
           Group = cfg.group;
@@ -288,8 +291,8 @@ in
               pkgs.writeText "Tdarr_Server_Config.json" (
                 builtins.toJSON (
                   {
-                    serverPort = toString cfg.serverPort;
-                    webUIPort = toString cfg.webUIPort;
+                    serverPort = cfg.serverPort;
+                    webUIPort = cfg.webUIPort;
                     serverIP = cfg.serverIP;
                     serverBindIP = false;
                     serverDualStack = cfg.serverDualStack;
@@ -314,29 +317,27 @@ in
     }
     // (mapAttrs' (
       nodeId: nodeCfg:
-      nameValuePair "tdarr-node-${nodeId}" (
-        mkIf nodeCfg.enable {
-          description = "Tdarr Node - ${nodeCfg.name}";
-          after = [
-            "network.target"
-            "tdarr-server.service"
-          ];
-          wants = [ "tdarr-server.service" ];
-          wantedBy = [ "multi-user.target" ];
-          environment.rootDataPath = nodeCfg.dataDir;
-          serviceConfig = {
-            User = cfg.user;
-            Group = cfg.group;
-            ExecStartPre = pkgs.writeShellScript "tdarr-node-${nodeId}-pre" ''
-              ${pkgs.coreutils}/bin/install -m 644 ${pkgs.writeText "Tdarr_Node_Config_${nodeId}.json" (builtins.toJSON (mkNodeConfig nodeId nodeCfg))} ${toString nodeCfg.dataDir}/configs/Tdarr_Node_Config.json
-            '';
-            ExecStart = "${cfg.package}/bin/tdarr-node";
-            ReadWritePaths = [ cfg.dataDir ];
-            Restart = "on-failure";
-          };
-        }
-      )
-    ) cfg.nodes);
+      nameValuePair "tdarr-node-${nodeId}" {
+        description = "Tdarr Node - ${nodeCfg.name}";
+        after = [
+          "network.target"
+          "tdarr-server.service"
+        ];
+        wants = [ "tdarr-server.service" ];
+        wantedBy = [ "multi-user.target" ];
+        environment.rootDataPath = toString nodeCfg.dataDir;
+        serviceConfig = {
+          User = cfg.user;
+          Group = cfg.group;
+          ExecStartPre = pkgs.writeShellScript "tdarr-node-${nodeId}-pre" ''
+            ${pkgs.coreutils}/bin/install -m 644 ${pkgs.writeText "Tdarr_Node_Config_${nodeId}.json" (builtins.toJSON (mkNodeConfig nodeId nodeCfg))} ${toString nodeCfg.dataDir}/configs/Tdarr_Node_Config.json
+          '';
+          ExecStart = "${cfg.package}/bin/tdarr-node";
+          ReadWritePaths = [ cfg.dataDir ];
+          Restart = "on-failure";
+        };
+      }
+    ) enabledNodes);
 
     networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [
       cfg.serverPort
