@@ -23,7 +23,7 @@
   libxfixes,
   tesseract4,
   libredirect,
-  nvtop ? config.cudaSupport,
+  nvtop,
 }:
 let
   version = "2.58.02";
