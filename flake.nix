@@ -41,7 +41,9 @@
         };
 
       # Export NixOS modules
-      nixosModules = import ./modules;
+      nixosModules = {
+        default = import ./modules;
+      };
 
       # Convenience: individual module access
       # nixosModules.some-service = import ./modules/some-service;
