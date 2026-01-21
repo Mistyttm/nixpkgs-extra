@@ -23,7 +23,8 @@
   libxfixes,
   tesseract4,
   libredirect,
-  nvtop,
+  nvtopPackages ? null,
+  nvtop ? null,
 }:
 let
   version = "2.58.02";
@@ -67,6 +68,16 @@ let
     sha256 = hashes.${platform}.node;
     stripRoot = false;
   };
+
+  nvtopPkg =
+    if config.cudaSupport then
+      if nvtopPackages != null && nvtopPackages ? nvidia
+      then nvtopPackages.nvidia
+      else if nvtop != null
+      then nvtop
+      else throw "tdarr: cudaSupport is enabled but no nvtop package was provided"
+    else
+      null;
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "tdarr";
@@ -159,7 +170,7 @@ stdenv.mkDerivation (finalAttrs: {
       --set-default handbrakePath "${handbrake}/bin/HandBrakeCLI" \
       --set-default ffmpegPath "${ffmpeg}/bin/ffmpeg" \
       --set-default mkvpropeditPath "${mkvtoolnix}/bin/mkvpropedit" \
-      ${lib.optionalString config.cudaSupport "--set nvidiaHealthCheckPath '${nvtop}/bin/nvtop'"}
+      ${lib.optionalString config.cudaSupport "--set nvidiaHealthCheckPath '${nvtopPkg}/bin/nvtop'"}
   '';
 
   meta = {
