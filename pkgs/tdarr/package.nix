@@ -23,17 +23,19 @@
   libxfixes,
   tesseract4,
   libredirect,
-  nvtop ? config.cudaSupport
+  nvtop ? config.cudaSupport,
 }:
 let
   version = "2.58.02";
 
-  platform = {
-    x86_64-linux = "linux_x64";
-    aarch64-linux = "linux_arm64";
-    x86_64-darwin = "darwin_x64";
-    aarch64-darwin = "darwin_arm64";
-  }.${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
+  platform =
+    {
+      x86_64-linux = "linux_x64";
+      aarch64-linux = "linux_arm64";
+      x86_64-darwin = "darwin_x64";
+      aarch64-darwin = "darwin_arm64";
+    }
+    .${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
 
   hashes = {
     linux_x64 = {
@@ -72,10 +74,9 @@ stdenv.mkDerivation (finalAttrs: {
 
   dontUnpack = true;
 
-  nativeBuildInputs = [ makeWrapper ]
-    ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ];
+  nativeBuildInputs = [ makeWrapper ] ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ];
 
-  buildInputs = lib.optionals stdenv.isLinux ([
+  buildInputs = lib.optionals stdenv.isLinux [
     stdenv.cc.cc.lib
     gtk3
     libayatana-appindicator
@@ -91,7 +92,7 @@ stdenv.mkDerivation (finalAttrs: {
     libxcursor
     libxfixes
     libredirect
-  ]);
+  ];
 
   preInstall = ''
     mkdir -p $out/{bin,share/tdarr/{server,node}}
@@ -126,7 +127,14 @@ stdenv.mkDerivation (finalAttrs: {
     done
 
     makeWrapper $out/share/tdarr/server/Tdarr_Server $out/bin/tdarr-server \
-      --prefix PATH : ${lib.makeBinPath [ ffmpeg handbrake mkvtoolnix ccextractor ]} \
+      --prefix PATH : ${
+        lib.makeBinPath [
+          ffmpeg
+          handbrake
+          mkvtoolnix
+          ccextractor
+        ]
+      } \
       --run "export rootDataPath=\''${rootDataPath:-/var/lib/tdarr/server}" \
       --run "mkdir -p \"\$rootDataPath\"/configs \"\$rootDataPath\"/logs" \
       --run "cd \"\$rootDataPath\"" \
@@ -137,15 +145,20 @@ stdenv.mkDerivation (finalAttrs: {
       --set-default ccextractorPath "${ccextractor}/bin/ccextractor"
 
     makeWrapper $out/share/tdarr/node/Tdarr_Node $out/bin/tdarr-node \
-      --prefix PATH : ${lib.makeBinPath [ ffmpeg handbrake mkvtoolnix ccextractor ]} \
+      --prefix PATH : ${
+        lib.makeBinPath [
+          ffmpeg
+          handbrake
+          mkvtoolnix
+          ccextractor
+        ]
+      } \
       --run "export rootDataPath=\''${rootDataPath:-/var/lib/tdarr/node}" \
       --run "mkdir -p \"\$rootDataPath\"/configs \"\$rootDataPath\"/logs \"\$rootDataPath\"/assets/app/plugins" \
       --run "cd \"\$rootDataPath\"" \
       --set-default handbrakePath "${handbrake}/bin/HandBrakeCLI" \
       --set-default ffmpegPath "${ffmpeg}/bin/ffmpeg" \
       --set-default mkvpropeditPath "${mkvtoolnix}/bin/mkvpropedit" \
-      --set-default ffprobePath "${ffmpeg}/bin/ffprobe" \
-      --set-default ccextractorPath "${ccextractor}/bin/ccextractor" \
       ${lib.optionalString config.cudaSupport "--set nvidiaHealthCheckPath '${nvtop}/bin/nvtop'"}
   '';
 
@@ -153,7 +166,12 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Distributed transcode automation using FFmpeg/HandBrake";
     homepage = "https://tdarr.io";
     license = lib.licenses.unfree;
-    platforms = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-    maintainers = with lib.maintainers; [ misty_ttm ];
+    platforms = [
+      "x86_64-linux"
+      "aarch64-linux"
+      "x86_64-darwin"
+      "aarch64-darwin"
+    ];
+    maintainers = with lib.maintainers; [ mistyttm ];
   };
 })
