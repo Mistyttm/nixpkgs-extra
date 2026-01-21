@@ -15,7 +15,7 @@ let
     name: nodeCfg:
     {
       nodeName = nodeCfg.name;
-      serverURL = "http://${cfg.serverIP}:${toString cfg.serverPort}";
+      serverURL = "http://${toString cfg.serverIP}:${toString cfg.serverPort}";
       serverIP = cfg.serverIP;
       serverPort = toString cfg.serverPort;
       pathTranslators = nodeCfg.pathTranslators;
@@ -328,7 +328,7 @@ in
             User = cfg.user;
             Group = cfg.group;
             ExecStartPre = pkgs.writeShellScript "tdarr-node-${nodeId}-pre" ''
-              ${pkgs.coreutils}/bin/install -m 644 ${pkgs.writeText "Tdarr_Node_Config_${nodeId}.json" (builtins.toJSON (mkNodeConfig nodeId nodeCfg))} ${nodeCfg.dataDir}/configs/Tdarr_Node_Config.json
+              ${pkgs.coreutils}/bin/install -m 644 ${pkgs.writeText "Tdarr_Node_Config_${nodeId}.json" (builtins.toJSON (mkNodeConfig nodeId nodeCfg))} ${toString nodeCfg.dataDir}/configs/Tdarr_Node_Config.json
             '';
             ExecStart = "${cfg.package}/bin/tdarr-node";
             ReadWritePaths = [ cfg.dataDir ];
