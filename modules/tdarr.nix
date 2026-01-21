@@ -310,7 +310,7 @@ in
             } ${serverDataDir}/configs/Tdarr_Server_Config.json
           '';
           ExecStart = "${cfg.package}/bin/tdarr-server";
-          ReadWritePaths = [ cfg.dataDir ];
+          # ReadWritePaths = [ cfg.dataDir ];
           Restart = "on-failure";
         };
       };
@@ -333,7 +333,7 @@ in
             ${pkgs.coreutils}/bin/install -m 644 ${pkgs.writeText "Tdarr_Node_Config_${nodeId}.json" (builtins.toJSON (mkNodeConfig nodeId nodeCfg))} ${toString nodeCfg.dataDir}/configs/Tdarr_Node_Config.json
           '';
           ExecStart = "${cfg.package}/bin/tdarr-node";
-          ReadWritePaths = [ cfg.dataDir ];
+          # ReadWritePaths = [ cfg.dataDir ];
           Restart = "on-failure";
         };
       }
