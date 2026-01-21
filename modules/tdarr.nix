@@ -347,6 +347,5 @@ in
 
   meta = {
     maintainers = with maintainers; [ mistyttm ];
-    doc = ./tdarr.md;
   };
 }
