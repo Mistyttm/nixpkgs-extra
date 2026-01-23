@@ -273,27 +273,40 @@ in
       script = ''
         set -e
 
-        mkdir -p ${cfg.dataDir}/app ${cfg.dataDir}/storage ${cfg.dataDir}/uploads ${cfg.dataDir}/database
-        touch ${cfg.dataDir}/database/database.sqlite
+        echo "Starting Heimdall initialization..."
 
-        export DB_CONNECTION=sqlite
-        export DB_DATABASE=${cfg.dataDir}/database/database.sqlite
+        # Create all necessary directories
+        mkdir -p ${cfg.dataDir}/app
+        mkdir -p ${cfg.dataDir}/storage/app
+        mkdir -p ${cfg.dataDir}/storage/framework/cache
+        mkdir -p ${cfg.dataDir}/storage/framework/sessions
+        mkdir -p ${cfg.dataDir}/storage/framework/views
+        mkdir -p ${cfg.dataDir}/storage/logs
+        mkdir -p ${cfg.dataDir}/uploads
 
-        chown -R ${user}:${group} ${cfg.dataDir}
-        chmod -R u+rwX ${cfg.dataDir}
+        # Create database file FIRST if it doesn't exist
+        if [ ! -f ${cfg.dataDir}/database.sqlite ]; then
+          echo "Creating database file..."
+          touch ${cfg.dataDir}/database.sqlite
+          chown ${user}:${group} ${cfg.dataDir}/database.sqlite
+          chmod 640 ${cfg.dataDir}/database.sqlite
+        fi
 
-        # Ensure writable app copy exists
+        # Copy application files if first run
         if [ ! -e ${cfg.dataDir}/app/.heimdall-installed ]; then
+          echo "Installing Heimdall application files..."
           cp -R ${cfg.package}/share/heimdall/* ${cfg.dataDir}/app/
           touch ${cfg.dataDir}/app/.heimdall-installed
         fi
 
+        # Ensure correct ownership
         chown -R ${user}:${group} ${cfg.dataDir}
         chmod -R u+rwX ${cfg.dataDir}
 
         cd ${cfg.dataDir}/app
 
-        # Generate the .env file with secrets
+        # Generate the .env file
+        echo "Generating .env file..."
         ${envGenerator} ${cfg.dataDir}/.env
 
         # Link storage directories
@@ -302,17 +315,11 @@ in
           ln -sf ${cfg.dataDir}/storage storage
         fi
 
-        # Link database
+        # Create database directory in app and link the database file
+        mkdir -p database
         if [ ! -L database/database.sqlite ]; then
-          mkdir -p database
+          rm -f database/database.sqlite
           ln -sf ${cfg.dataDir}/database.sqlite database/database.sqlite
-        fi
-
-        # Ensure sqlite db exists and is writable
-        if [ ! -e ${cfg.dataDir}/database.sqlite ]; then
-          touch ${cfg.dataDir}/database.sqlite
-          chown ${user}:${group} ${cfg.dataDir}/database.sqlite
-          chmod 600 ${cfg.dataDir}/database.sqlite
         fi
 
         # Link uploads
@@ -324,16 +331,51 @@ in
         # Link .env file
         ln -sf ${cfg.dataDir}/.env .env
 
-        # Create database if it doesn't exist
+        # Check if database is empty (needs initialization)
+        DB_EMPTY=0
         if [ ! -s ${cfg.dataDir}/database.sqlite ]; then
-          ${heimdallPhp}/bin/php artisan migrate --force
+          DB_EMPTY=1
+          echo "Database is empty, will initialize..."
+        else
+          # Check if migrations table exists
+          if ! ${pkgs.sqlite}/bin/sqlite3 ${cfg.dataDir}/database.sqlite "SELECT name FROM sqlite_master WHERE type='table' AND name='migrations';" | grep -q migrations; then
+            DB_EMPTY=1
+            echo "Migrations table missing, will initialize..."
+          fi
         fi
 
-        # Clear and cache configuration
-        ${heimdallPhp}/bin/php artisan config:clear
+        # Initialize database schema if needed
+        if [ "$DB_EMPTY" = "1" ]; then
+          echo "Creating initial database schema..."
+          ${pkgs.sqlite}/bin/sqlite3 ${cfg.dataDir}/database.sqlite <<'SQL'
+            CREATE TABLE IF NOT EXISTS migrations (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              migration VARCHAR(255) NOT NULL,
+              batch INTEGER NOT NULL
+            );
+SQL
+          chown ${user}:${group} ${cfg.dataDir}/database.sqlite
+          chmod 640 ${cfg.dataDir}/database.sqlite
+        fi
+
+        # Run migrations
+        echo "Running migrations..."
+        ${heimdallPhp}/bin/php artisan migrate --force
+
+        # Clear all caches
+        echo "Clearing caches..."
+        ${heimdallPhp}/bin/php artisan config:clear || true
+        ${heimdallPhp}/bin/php artisan route:clear || true
+        ${heimdallPhp}/bin/php artisan view:clear || true
+        ${heimdallPhp}/bin/php artisan cache:clear || true
+
+        # Cache configuration
+        echo "Caching configuration..."
         ${heimdallPhp}/bin/php artisan config:cache
         ${heimdallPhp}/bin/php artisan route:cache
         ${heimdallPhp}/bin/php artisan view:cache
+
+        echo "Heimdall initialization complete!"
       '';
     };
 
