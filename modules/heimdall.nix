@@ -16,6 +16,9 @@ let
     with all;
     enabled
     ++ [
+      pdo
+      pdo_sqlite
+      sqlite3
       ctype
       curl
       dom
@@ -270,7 +273,12 @@ in
       script = ''
         set -e
 
-        mkdir -p ${cfg.dataDir}/app ${cfg.dataDir}/storage ${cfg.dataDir}/uploads
+        mkdir -p ${cfg.dataDir}/app ${cfg.dataDir}/storage ${cfg.dataDir}/uploads ${cfg.dataDir}/database
+        touch ${cfg.dataDir}/database/database.sqlite
+
+        export DB_CONNECTION=sqlite
+        export DB_DATABASE=${cfg.dataDir}/database/database.sqlite
+
         chown -R ${user}:${group} ${cfg.dataDir}
         chmod -R u+rwX ${cfg.dataDir}
 
