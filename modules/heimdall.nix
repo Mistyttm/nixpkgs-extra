@@ -259,6 +259,8 @@ in
 
       serviceConfig = {
         Type = "oneshot";
+        StateDirectory = "heimdall";
+        StateDirectoryMode = "0750";
         User = user;
         Group = group;
         RemainAfterExit = true;
@@ -266,6 +268,8 @@ in
 
       script = ''
         set -e
+
+        mkdir -p ${cfg.dataDir}/app
 
         # Ensure writable app copy exists
         if [ ! -e ${cfg.dataDir}/app/.heimdall-installed ]; then
