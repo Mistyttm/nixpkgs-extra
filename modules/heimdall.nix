@@ -280,6 +280,9 @@ in
           touch ${cfg.dataDir}/app/.heimdall-installed
         fi
 
+        chown -R ${user}:${group} ${cfg.dataDir}
+        chmod -R u+rwX ${cfg.dataDir}
+
         cd ${cfg.dataDir}/app
 
         # Generate the .env file with secrets
