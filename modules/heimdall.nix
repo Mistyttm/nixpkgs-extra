@@ -264,6 +264,7 @@ in
         User = user;
         Group = group;
         RemainAfterExit = true;
+        ReadWritePaths = [ cfg.dataDir ];
       };
 
       script = ''
