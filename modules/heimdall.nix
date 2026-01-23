@@ -237,6 +237,7 @@ in
 
     systemd.tmpfiles.rules = [
       "d '${cfg.dataDir}' 0750 ${user} ${group} - -"
+      "d '${cfg.dataDir}/app' 0750 ${user} ${group} - -"
       "d '${cfg.dataDir}/storage' 0750 ${user} ${group} - -"
       "d '${cfg.dataDir}/storage/app' 0750 ${user} ${group} - -"
       "d '${cfg.dataDir}/storage/framework' 0750 ${user} ${group} - -"
@@ -264,7 +265,15 @@ in
       };
 
       script = ''
-        cd ${cfg.package}/share/heimdall
+        set -e
+
+        # Ensure writable app copy exists
+        if [ ! -e ${cfg.dataDir}/app/.heimdall-installed ]; then
+          cp -R ${cfg.package}/share/heimdall/* ${cfg.dataDir}/app/
+          touch ${cfg.dataDir}/app/.heimdall-installed
+        fi
+
+        cd ${cfg.dataDir}/app
 
         # Generate the .env file with secrets
         ${envGenerator} ${cfg.dataDir}/.env
@@ -319,7 +328,7 @@ in
       // cfg.poolConfig;
 
       phpEnv = {
-        HEIMDALL_ROOT = "${cfg.package}/share/heimdall";
+        HEIMDALL_ROOT = "${cfg.dataDir}/app";
       };
     };
 
@@ -327,7 +336,7 @@ in
       enable = true;
 
       virtualHosts.${cfg.nginx.hostName} = {
-        root = "${cfg.package}/share/heimdall/public";
+        root = "${cfg.dataDir}/app/public";
 
         extraConfig = ''
           index index.php;
