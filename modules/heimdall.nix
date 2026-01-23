@@ -300,6 +300,13 @@ in
           ln -sf ${cfg.dataDir}/database.sqlite database/database.sqlite
         fi
 
+        # Ensure sqlite db exists and is writable
+        if [ ! -e ${cfg.dataDir}/database.sqlite ]; then
+          touch ${cfg.dataDir}/database.sqlite
+          chown ${user}:${group} ${cfg.dataDir}/database.sqlite
+          chmod 600 ${cfg.dataDir}/database.sqlite
+        fi
+
         # Link uploads
         if [ ! -L public/backgrounds ]; then
           rm -rf public/backgrounds
