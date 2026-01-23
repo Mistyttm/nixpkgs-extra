@@ -10,6 +10,9 @@ let
   # Create PHP with required extensions
   php = php83.withExtensions ({ enabled, all }: with all;
     enabled ++ [
+      pdo
+      pdo_sqlite
+      sqlite3
       ctype
       curl
       dom
@@ -60,7 +63,7 @@ in buildNpmPackage (finalAttrs:{
 
   buildPhase = ''
     runHook preBuild
-    
+
     npm run production
 
     runHook postBuild
