@@ -269,7 +269,9 @@ in
       script = ''
         set -e
 
-        mkdir -p ${cfg.dataDir}/app
+        mkdir -p ${cfg.dataDir}/app ${cfg.dataDir}/storage ${cfg.dataDir}/uploads
+        chown -R ${user}:${group} ${cfg.dataDir}
+        chmod -R u+rwX ${cfg.dataDir}
 
         # Ensure writable app copy exists
         if [ ! -e ${cfg.dataDir}/app/.heimdall-installed ]; then
