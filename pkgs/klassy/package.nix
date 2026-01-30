@@ -13,7 +13,7 @@
 }:
 mkKdeDerivation {
   pname = "klassy";
-  version = "6.4.breeze6.4.0";
+  version = "6.4";
   src = fetchFromGitHub {
     owner = "paulmcauley";
     repo = "klassy";

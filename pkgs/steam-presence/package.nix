@@ -42,7 +42,7 @@ let
 in
 buildPythonPackage {
   pname = "steam-presence";
-  version = "1.12.2";
+  version = "1.12.3";
   format = "other";
 
   src = fetchFromGitHub {
