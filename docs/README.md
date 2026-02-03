@@ -1,8 +1,22 @@
 # Nixpkgs-Extra Documentation
 
-*Automatically generated on 2026-01-20*
+*Automatically generated on 2026-02-03*
 
 ## Available Packages
+
+### claude-vault
+
+Sync Claude AI conversations to Obsidian markdown files
+
+- **License**: agpl3Plus
+- **Homepage**: [https://github.com/MarioPadilla/claude-vault](https://github.com/MarioPadilla/claude-vault)
+
+### heimdall
+
+Application dashboard and launcher
+
+- **License**: mit
+- **Homepage**: [https://heimdall.site](https://heimdall.site)
 
 ### jackify
 
