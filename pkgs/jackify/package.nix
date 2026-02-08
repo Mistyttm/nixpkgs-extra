@@ -37,7 +37,7 @@
 }:
 
 let
-  version = "0.2.1";
+  version = "0.3.0";
   jackify-engine = callPackage ./jackify-engine/engine.nix { };
 in
 buildPythonApplication {
@@ -49,7 +49,7 @@ buildPythonApplication {
     owner = "Omni-guides";
     repo = "Jackify";
     rev = "v${version}";
-    sha256 = "1ff1d0cwlgg63gydrnln0z0624ix2h27jdx9gj5ckrfcx6zh0sfk";
+    sha256 = "sha256-2L1YYWBR++qEKlNf7h3VE0dKZqUki0f85IFYAfSrRFk=";
   };
 
   build-system = [
