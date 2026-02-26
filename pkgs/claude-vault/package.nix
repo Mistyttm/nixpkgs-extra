@@ -16,14 +16,14 @@
 
 buildPythonApplication (finalAttrs: {
   pname = "claude-vault";
-  version = "0.4.2";
+  version = "0.6.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "MarioPadilla";
     repo = "claude-vault";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-f6vWe5S5/hY20WtBnOMveRjxcoj7MFjDVmGMTKrjekc=";
+    hash = "sha256-1eJpz1/FjEW1g5MnZRhsaJQBNU8JWy5g07IyTr7cOrA=";
   };
 
   build-system = [
