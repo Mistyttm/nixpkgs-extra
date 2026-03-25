@@ -1,7 +1,7 @@
 {
   lib,
   python3,
-  fetchFromGitHub, pkg-config, fetchurl,
+  fetchFromGitHub, pkg-config,
 }:
 
 
