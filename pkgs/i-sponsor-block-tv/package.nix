@@ -109,6 +109,18 @@ let
     build-system = [ python3.pkgs.setuptools python3.pkgs.wheel ];
     dependencies = [ ];
   };
+  ssdp_1_3_1 = python3.pkgs.buildPythonPackage {
+    pname = "ssdp";
+    version = "1.3.1";
+    pyproject = true;
+    src = fetchPypi {
+      pname = "ssdp";
+      version = "1.3.1";
+      hash = "sha256-H9Fpk/Xp+3UOl1vaCAuMh0qkx3WdP0pB0y5BYuu+cZg=";
+    };
+    build-system = [ python3.pkgs.setuptools python3.pkgs.wheel python3.pkgs.flit-scm ];
+    dependencies = [ ];
+  };
 in
 python3.pkgs.buildPythonApplication (finalAttrs: {
   pname = "i-sponsor-block-tv";
@@ -134,7 +146,7 @@ python3.pkgs.buildPythonApplication (finalAttrs: {
     pyytlounge_2_3_0
     rich_14_1_0
     rich_click_1_8_9
-    python3.pkgs.ssdp
+    ssdp_1_3_1
     textual_5_3_0
     textual_slider_0_2_0
     xmltodict_0_15_1
